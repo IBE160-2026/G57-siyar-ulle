@@ -133,8 +133,6 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-                st.subheader("Sammendrag")
-                st.write(response.text)
+               
 
-            except Exception as e:
-                st.error(f"Noe gikk galt: {e}")
+           
