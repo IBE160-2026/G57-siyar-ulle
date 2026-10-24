@@ -12,6 +12,8 @@ import os
 import streamlit as st
 from dotenv import load_dotenv
 
+from quiz_service import calculate_score
+
 MIN_TEXT_LENGTH = 100
 MAX_TEXT_LENGTH = 15_000
 DEMO_TEXT = (
@@ -26,7 +28,28 @@ DEMO_SUMMARY = (
     "I eksempelet velger studenten å studere i stedet for å jobbe, og gir "
     "derfor avkall på 400 kroner i lønn."
 )
-
+DEMO_QUIZ = [
+    {
+        "question": "Hva betyr alternativkostnad?",
+        "options": [
+            "Prisen på et produkt",
+            "Verdien av det beste alternativet du velger bort",
+            "Hvor mye skatt du betaler",
+            "En type rabatt",
+        ],
+        "correct_answer": 1,
+    },
+    {
+        "question": "Hva velger studenten bort i eksemplet?",
+        "options": [
+            "Å studere",
+            "Å jobbe og tjene 400 kroner",
+            "Å kjøpe mat",
+            "Å reise",
+        ],
+        "correct_answer": 1,
+    },
+]
 
 def validate_text(text: str) -> str:
     """Valider før API-kall; tell tegn etter trimming."""
@@ -129,7 +152,23 @@ def main() -> None:
         st.subheader("Demosammendrag" if is_demo else "Sammendrag")
         st.write(st.session_state["summary"])
         st.caption("Innholdet lagres bare i denne økten. Lokal historikk kommer i v1.")
+st.subheader("Quiz")
 
+user_answers = []
+
+for index, item in enumerate(DEMO_QUIZ):
+    answer = st.radio(
+        item["question"],
+        item["options"],
+        key=f"quiz_{index}",
+    )
+    user_answers.append(item["options"].index(answer))
+
+if st.button("Sjekk svar"):
+    correct_answers = [item["correct_answer"] for item in DEMO_QUIZ]
+    score = calculate_score(user_answers, correct_answers)
+
+    st.success(f"Du fikk {score} av {len(DEMO_QUIZ)} riktige.")
 
 if __name__ == "__main__":
     main()
